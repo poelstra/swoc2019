@@ -33,6 +33,10 @@ export interface Cell {
     type: number;
 }
 
+export enum GameState {
+    Waiting = 0,
+}
+
 export interface MazeFrame {
     actionItems: ActionItem[];
     bots: Bot[];
@@ -40,9 +44,20 @@ export interface MazeFrame {
     columns: number;
     rows: number;
     gameId: number;
-    gameState: number;
+    gameState: GameState;
     gameTick: number;
 }
+
+export const EMPTY_FRAME: MazeFrame = {
+    actionItems: [],
+    bots: [],
+    columns: 0,
+    rows: 0,
+    data: [],
+    gameId: -1,
+    gameState: GameState.Waiting,
+    gameTick: 0,
+};
 
 export class Maze extends EventEmitter {
     private _socket: net.Socket | undefined;

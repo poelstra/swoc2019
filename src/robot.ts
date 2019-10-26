@@ -10,8 +10,8 @@ export enum Direction {
 }
 
 const directions = {
-    [Direction.Forward]: "f",
-    [Direction.Back]: "b",
+    [Direction.Forward]: "b",
+    [Direction.Back]: "f",
     [Direction.Left]: "w",
     [Direction.Right]: "c",
 };
