@@ -1,6 +1,6 @@
 import * as process from "process";
 import { Robot, Direction } from "./robot";
-import { Maze, MazeFrame, Bot, Point } from "./maze";
+import { Maze, MazeFrame, Bot } from "./maze";
 import { delay, never } from "./util";
 import { diff, maze2point, point, angle, rad2deg } from "./point";
 
