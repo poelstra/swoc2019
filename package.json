@@ -15,6 +15,7 @@
     "mocha": "^6.2.2"
   },
   "dependencies": {
+    "astar-typescript": "^1.0.96",
     "source-map-support": "^0.5.13"
   }
 }
