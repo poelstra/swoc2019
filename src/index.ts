@@ -13,8 +13,6 @@ const robot = new Robot("localhost", 4243);
 let game: Game = new Game(BOT_NAME);
 let motion: MotionController = new MotionController(game, robot);
 
-const destination = point(0.3, 0.6);
-
 async function robotController(): Promise<never> {
     while (true) {
         try {
@@ -41,10 +39,29 @@ async function mazeController(): Promise<never> {
 }
 
 async function motionController(): Promise<never> {
+    const path = [
+        point(0.4, 0.4),
+        point(0.6, 0.4),
+        point(0.6, 0.6),
+        point(0.4, 0.6),
+    ];
+    let i = 0;
     while (true) {
         await delay(500);
-        const reached = await motion.moveTo(destination);
-        console.log(game.frame.gameTick, game.myBot.position, reached);
+        const reached = await motion.moveTo(path[i]);
+        console.log(
+            game.frame.gameTick,
+            i,
+            path[i],
+            game.myBot.position,
+            reached
+        );
+        if (reached) {
+            i++;
+            if (i >= path.length) {
+                i = 0;
+            }
+        }
     }
 }
 
