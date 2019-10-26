@@ -1,6 +1,7 @@
 import { MazeFrame } from "./maze";
 import { AStarFinder } from "astar-typescript";
 import { IPoint } from "astar-typescript/dist/interfaces/astar-interfaces";
+import { Point, diff, length } from "./point";
 
 const cellTemplate = [
     {
@@ -40,8 +41,34 @@ const cellTemplate = [
     },
 ];
 
-function convertWalkingGrid(frame: MazeFrame): number[][] {
+function hasSpike(frame: MazeFrame, x: number, y: number): boolean {
+    let spikeDetected: boolean = false;
+
+    frame.actionItems.forEach(item => {
+        if (item.type == "SpikeTrap") {
+            let spikePoint: Point = {
+                x: item.x,
+                y: item.y,
+            };
+            let cellPoint: Point = {
+                x: toFrameXCoordinate(frame, x),
+                y: toFrameYCoordinate(frame, y),
+            };
+
+            let p: Point = diff(spikePoint, cellPoint);
+            let len = length(p);
+            if (len <= 0.5 / Math.min(frame.columns, frame.rows)) {
+                spikeDetected = true;
+            }
+        }
+    });
+
+    return spikeDetected;
+}
+
+function convertWalkingGrid(frame: MazeFrame, avoidSpike: boolean): number[][] {
     let walkingGrid: number[][] = [];
+    let rowNumber: number = 0;
 
     frame.data.forEach(row => {
         let toRight: number[] = [];
@@ -52,7 +79,11 @@ function convertWalkingGrid(frame: MazeFrame): number[][] {
 
             //console.log("Templ:" + template);
 
-            toRight.push(0); // Center of the cell is always walkable
+            // Center of the cell
+            if (avoidSpike && hasSpike(frame, toRight.length, rowNumber)) {
+                toRight.push(1);
+            } else toRight.push(0);
+
             toRight.push(template[0]); // Walkability to right of the cell depends on the maze template
             toTop.push(template[1]); // Walkability to top of the cell depends on the maze template
             toTop.push(1); // Bottom right corner is always a wall
@@ -60,19 +91,43 @@ function convertWalkingGrid(frame: MazeFrame): number[][] {
 
         walkingGrid.push(toRight);
         walkingGrid.push(toTop);
+        rowNumber += 2;
     });
 
     return walkingGrid;
 }
 
+function toFrameXCoordinate(frame: MazeFrame, x: number): number {
+    return x / (frame.columns * 2) + 0.5 / frame.columns;
+}
+
+function toFrameYCoordinate(frame: MazeFrame, y: number): number {
+    return y / (frame.rows * 2) + 0.5 / frame.rows;
+}
+
+function fromFrameCoordinate(frame: MazeFrame, p: IPoint): IPoint {
+    return {
+        x: fromFrameXCoordinate(frame, p.x),
+        y: fromFrameYCoordinate(frame, p.y),
+    };
+}
+
+function fromFrameXCoordinate(frame: MazeFrame, x: number): number {
+    return Math.round((x - 0.5 / frame.columns) * (frame.columns * 2));
+}
+
+function fromFrameYCoordinate(frame: MazeFrame, y: number): number {
+    return Math.round((y - 0.5 / frame.rows) * (frame.rows * 2));
+}
+
 export function findPath(
     frame: MazeFrame,
     start: IPoint,
-    end: IPoint
+    end: IPoint,
+    avoidSpike: boolean
 ): number[][] {
-    const walkingGrid = convertWalkingGrid(frame);
+    const walkingGrid = convertWalkingGrid(frame, avoidSpike);
     //console.log(walkingGrid);
-    //assert.deepEqual(rad2deg(angle(point(1, 1))), 45);
 
     let aStarInstance: AStarFinder;
 
@@ -82,11 +137,14 @@ export function findPath(
         },
     });
 
-    let myPathway = aStarInstance.findPath(start, end);
+    let myPathway = aStarInstance.findPath(
+        fromFrameCoordinate(frame, start),
+        fromFrameCoordinate(frame, end)
+    );
 
     let path = myPathway.map(coord => [
-        coord[0] / (frame.columns * 2) + 0.5 / frame.columns,
-        coord[1] / (frame.rows * 2) + 0.5 / frame.rows,
+        toFrameXCoordinate(frame, coord[0]),
+        toFrameYCoordinate(frame, coord[1]),
     ]);
 
     return path;

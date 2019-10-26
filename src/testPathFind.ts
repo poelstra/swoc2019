@@ -10,12 +10,17 @@ const exampleframe = exampleFrame as MazeFrame;
 
 describe("maze", () => {
     describe("pathfinding", () => {
-        it("convertMazeToWalkingGrid", () => {
-            let startPos = { x: 0, y: 0 };
-            let goalPos = { x: 4, y: 5 };
+        it("findPath", () => {
+            let startPos = { x: 0.05, y: 0.05 };
+            let goalPos = { x: 0.95, y: 0.45 };
 
-            let path = findPath(exampleframe, startPos, goalPos);
+            let path = findPath(exampleframe, startPos, goalPos, true);
             console.log(path);
+
+            let path2 = findPath(exampleframe, startPos, goalPos, false);
+            console.log(path2);
+
+            assert.notDeepStrictEqual(path, path2);
         });
     });
 });
