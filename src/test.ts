@@ -1,6 +1,11 @@
 import { point, diff, unit, angle, rad2deg } from "./point";
 import * as assert from "assert";
 
+import * as exampleFrame from "./example-frame.json";
+import { MazeFrame } from "./maze";
+
+const frame: MazeFrame = exampleFrame;
+
 describe("points", () => {
     describe("vectors", () => {
         it("works", () => {
