@@ -97,28 +97,43 @@ function convertWalkingGrid(frame: MazeFrame, avoidSpike: boolean): number[][] {
     return walkingGrid;
 }
 
-function toFrameXCoordinate(frame: MazeFrame, x: number): number {
+export function toFrameCoordinate(frame: MazeFrame, p: IPoint): IPoint {
+    return {
+        x: toFrameXCoordinate(frame, p.x),
+        y: toFrameYCoordinate(frame, p.y),
+    };
+}
+
+export function toFrameXCoordinate(frame: MazeFrame, x: number): number {
     return x / (frame.columns * 2) + 0.5 / frame.columns;
 }
 
-function toFrameYCoordinate(frame: MazeFrame, y: number): number {
+export function toFrameYCoordinate(frame: MazeFrame, y: number): number {
     return y / (frame.rows * 2) + 0.5 / frame.rows;
 }
 
-function fromFrameCoordinate(frame: MazeFrame, p: IPoint): IPoint {
+export function fromFrameCoordinate(frame: MazeFrame, p: IPoint): IPoint {
     return {
         x: fromFrameXCoordinate(frame, p.x),
         y: fromFrameYCoordinate(frame, p.y),
     };
 }
 
-function fromFrameXCoordinate(frame: MazeFrame, x: number): number {
-    return Math.round((x - 0.5 / frame.columns) * (frame.columns * 2));
+export function fromFrameXCoordinate(frame: MazeFrame, x: number): number {
+    return Math.floor(x * frame.columns) * 2;
 }
 
-function fromFrameYCoordinate(frame: MazeFrame, y: number): number {
-    return Math.round((y - 0.5 / frame.rows) * (frame.rows * 2));
+export function fromFrameYCoordinate(frame: MazeFrame, y: number): number {
+    return Math.floor(y * frame.rows) * 2;
 }
+
+// export function fromFrameXCoordinate(frame: MazeFrame, x: number): number {
+//     return Math.floor(x * frame.columns) * 2;
+// }
+
+// export function fromFrameYCoordinate(frame: MazeFrame, y: number): number {
+//     return Math.floor(y * frame.rows) * 2;
+// }
 
 export function findPath(
     frame: MazeFrame,
@@ -127,7 +142,7 @@ export function findPath(
     avoidSpike: boolean
 ): number[][] {
     const walkingGrid = convertWalkingGrid(frame, avoidSpike);
-    //console.log(walkingGrid);
+    // console.log(walkingGrid);
 
     let aStarInstance: AStarFinder;
 
@@ -137,10 +152,11 @@ export function findPath(
         },
     });
 
-    let myPathway = aStarInstance.findPath(
-        fromFrameCoordinate(frame, start),
-        fromFrameCoordinate(frame, end)
-    );
+    const gridStart = fromFrameCoordinate(frame, start);
+    const gridEnd = fromFrameCoordinate(frame, end);
+    // console.log(`start`, start, `end`, end);
+    // console.log(`start`, gridStart, `end`, gridEnd);
+    let myPathway = aStarInstance.findPath(gridStart, gridEnd);
 
     let path = myPathway.map(coord => [
         toFrameXCoordinate(frame, coord[0]),

@@ -11,11 +11,19 @@ type ActionItemType =
 
 type Orientation = 0 | 90 | 180 | 270;
 
+export enum ChestType {
+    Unknown,
+    Full,
+    Empty,
+    Mimick,
+}
+
 export interface ActionItem {
     id: number;
     type: ActionItemType;
     x: number;
     y: number;
+    chestType?: ChestType;
 }
 
 export interface Bot {

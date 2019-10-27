@@ -22,13 +22,24 @@ export class MotionController {
 
         const dirAngle = (rad2deg(angle(direction)) + 360) % 360;
         const botAngle = (rad2deg(angle(this._game.direction)) + 360) % 360;
-        const diffAngle = (dirAngle - botAngle) % 360;
+        let diffAngle = dirAngle - botAngle;
+        if (diffAngle > 180) diffAngle -= 360;
+        if (diffAngle < -180) diffAngle += 360;
+
+        console.log(
+            this._game.pos,
+            "->",
+            destination,
+            dirAngle.toFixed(0),
+            botAngle.toFixed(0),
+            diffAngle.toFixed(0)
+        );
 
         let move: Direction;
         if (diffAngle < -10) {
-            move = Direction.Right;
-        } else if (diffAngle > 10) {
             move = Direction.Left;
+        } else if (diffAngle > 10) {
+            move = Direction.Right;
         } else {
             move = Direction.Forward;
         }

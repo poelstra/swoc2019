@@ -16,6 +16,10 @@ export function point(x: number, y: number) {
     return { x, y };
 }
 
+export function distance(p1: Point, p2: Point): number {
+    return length(diff(p1, p2));
+}
+
 export function diff(p1: Point, p2: Point): Point {
     return {
         x: p1.x - p2.x,

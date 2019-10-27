@@ -30,17 +30,20 @@ export class Robot {
         if (this._socket) {
             return;
         }
-        this._socket = net.createConnection(this._port, this._host);
-        await once(this._socket, "connect");
+        const socket = net.createConnection(this._port, this._host);
+        await once(socket, "connect");
+        this._socket = socket;
     }
 
     private async _send(command: string): Promise<void> {
         await promisify<void>(callback => {
             process.stdout.write(command);
             if (!this._socket) {
-                throw new Error("not connected");
+                //throw new Error("not connected");
+                console.error("robot not connected");
+                return callback(null);
             }
-            this._socket.write(`${command}\n`, callback as any);
+            this._socket.write(`${command}\r`, callback as any);
         })();
         process.stdout.write("\n");
     }
